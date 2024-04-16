@@ -15,6 +15,16 @@ def find_and_output_between(text, first_group, second_group):
         between_text = match.group(1).strip()
         return between_text
     
+def get_words_after_pattern(text, pattern):
+    # This regex pattern looks for the specified pattern and then captures
+    # all characters after it until the end of the string.
+    match = re.search(pattern + r'(.*)', text)
+    if match:
+        # Extract the part after the pattern
+        after_pattern = match.group(1)
+        # Split the string into words and return them
+        return after_pattern
+    
 def evaluation_metric(llm_outputs, data_examples):    
 
     #first input is a list of outputs to be evaluated
@@ -34,7 +44,7 @@ def evaluation_metric(llm_outputs, data_examples):
     scores_out = [-1]*len(llm_outputs) #Initialize the scores with -1
     
     for i in range(len(llm_outputs)):
-        keys = data_examples[i]['keywords']
+        keys = data_examples[i]['keys']
 
         keyword_positions = []
 
@@ -47,18 +57,23 @@ def evaluation_metric(llm_outputs, data_examples):
             for n_k in range(len(keys)-1):
                 sentence = find_and_output_between(llm_outputs[i], keys[n_k], keys[n_k+1])
                 sentences_llm.append(sentence)
+            sentence = get_words_after_pattern(llm_outputs[i], keys[-1])
+            sentences_llm.append(sentence)
         else:
             scores_out[i] = 0 #This data point not follows the format
 
-    sentence_scores = bertscore.compute(predictions=sentences_llm, references=sentences_example, lang="en")
+    #print(sentences_llm)
+    #print(sentences_example)
+    sentence_scores = bertscore.compute(predictions=sentences_llm, references=sentences_example, lang="en")['recall']
 
     starting_index = 0
 
+    print(sentence_scores)
     for i in range(len(num_of_keys)):
         #get score per sample by averaging scores of its sentences
         score = sum(sentence_scores[starting_index:starting_index+num_of_keys[i]])/num_of_keys[i]
         starting_index += num_of_keys[i]
         index = find_leftmost_empty(scores_out)
-        scores_out[index] = score*5/num_of_keys[i] # normalize score to the range 0-5
+        scores_out[index] = score*5 # normalize score to the range 0-5
 
     return scores_out
