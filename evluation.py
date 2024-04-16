@@ -68,7 +68,6 @@ def evaluation_metric(llm_outputs, data_examples):
 
     starting_index = 0
 
-    print(sentence_scores)
     for i in range(len(num_of_keys)):
         #get score per sample by averaging scores of its sentences
         score = sum(sentence_scores[starting_index:starting_index+num_of_keys[i]])/num_of_keys[i]
