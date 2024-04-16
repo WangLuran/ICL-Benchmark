@@ -1,0 +1,1 @@
+{"question": " Please describe the image in detail covering the overall trend, maximum value, x-axis meaning and y-axis meaning.", "keys": ["Overall trend:", "Maximum value:", "X-axis meaning:", "Y-axis meaning:"], "example_outputs": [" The number of borrowers increases with loans funded per month from 2006-2013", " around 13000", " funded date", " the number of borrowers"]}
